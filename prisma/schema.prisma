@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String            @id @default(uuid())
+  nama         String
+  tanggalLahir DateTime
+  email        String            @unique
+  noHp         String            @unique
+  password     String
+  role         String            @default("user")
+  laporan      LaporanSampah[]
+  transaksi    TransaksiSampah[]
+}
+
+model JenisSampah {
+  id           String            @id @default(uuid())
+  statusSampah String
+  jenisSampah  String
+  namaSampah   String            @unique
+  laporan      LaporanSampah[]
+  metode       SampahMetode[]
+  transaksi    TransaksiSampah[]
+}
+
+model MetodePengolahan {
+  id          String         @id @default(uuid())
+  namaMetode  String         @unique
+  deskripsi   String
+  jenisSampah SampahMetode[]
+}
+
+model SampahMetode {
+  jenisSampahId      String
+  metodePengolahanId String
+  jenisSampah        JenisSampah      @relation(fields: [jenisSampahId], references: [id], onDelete: Cascade)
+  metodePengolahan   MetodePengolahan @relation(fields: [metodePengolahanId], references: [id], onDelete: Cascade)
+
+  @@id([jenisSampahId, metodePengolahanId])
+}
+
+model Wilayah {
+  id          String            @id @default(uuid())
+  namaWilayah String            @unique
+  laporan     LaporanSampah[]
+  transaksi   TransaksiSampah[]
+}
+
+model FotoSampah {
+  id        String        @id @default(uuid())
+  imageUrl  String
+  laporanId String        @unique
+  laporan   LaporanSampah @relation(fields: [laporanId], references: [id], onDelete: Cascade)
+}
+
+model LaporanSampah {
+  id            String      @id @default(uuid())
+  berat         Float
+  tanggalLapor  DateTime    @default(now())
+  userId        String
+  jenisSampahId String
+  wilayahId     String
+  foto          FotoSampah?
+  jenisSampah   JenisSampah @relation(fields: [jenisSampahId], references: [id])
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  wilayah       Wilayah     @relation(fields: [wilayahId], references: [id])
+}
+
+model TransaksiSampah {
+  id               String   @id @default(uuid())
+  berat            Float
+  status           String   @default("Menunggu")
+  tanggalTransaksi DateTime @default(now())
+
+  userId        String
+  jenisSampahId String
+  wilayahId     String
+
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jenisSampah JenisSampah @relation(fields: [jenisSampahId], references: [id])
+  wilayah     Wilayah     @relation(fields: [wilayahId], references: [id])
+}

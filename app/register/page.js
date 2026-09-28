@@ -4,14 +4,26 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const router = useRouter();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [form, setForm] = useState({
+    nama: "",
+    tanggalLahir: "",
+    email: "",
+    noHp: "",
+    password: "",
+  });
 
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  function handleChange(e) {
+    setForm({
+      ...form,
+      [e.target.name]: e.target.value,
+    });
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -20,17 +32,12 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/login", {
+      const response = await fetch("/api/register", {
         method: "POST",
-
         headers: {
           "Content-Type": "application/json",
         },
-
-        body: JSON.stringify({
-          email,
-          password,
-        }),
+        body: JSON.stringify(form),
       });
 
       const data = await response.json();
@@ -40,8 +47,9 @@ export default function LoginPage() {
         return;
       }
 
-      router.push("/dashboard");
-      router.refresh();
+      alert("Registrasi berhasil!");
+
+      router.push("/");
     } catch (error) {
       console.error(error);
 
@@ -59,10 +67,10 @@ export default function LoginPage() {
           🗑
         </div>
 
-        <h1>Dirty Deeds</h1>
+        <h1>Buat Akun</h1>
 
         <p className="login-subtitle">
-          Sistem Pengelolaan Sampah
+          Daftar ke Sistem Pengelolaan Sampah
         </p>
 
         {error && (
@@ -76,18 +84,61 @@ export default function LoginPage() {
           onSubmit={handleSubmit}
         >
           <div>
+            <label htmlFor="nama">
+              Nama
+            </label>
+
+            <input
+              id="nama"
+              name="nama"
+              type="text"
+              placeholder="Masukkan nama"
+              value={form.nama}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="tanggalLahir">
+              Tanggal Lahir
+            </label>
+
+            <input
+              id="tanggalLahir"
+              name="tanggalLahir"
+              type="date"
+              value={form.tanggalLahir}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div>
             <label htmlFor="email">
               Email
             </label>
 
             <input
               id="email"
+              name="email"
               type="email"
               placeholder="Masukkan email"
-              value={email}
-              onChange={(e) =>
-                setEmail(e.target.value)
-              }
+              value={form.email}
+              onChange={handleChange}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="noHp">
+              Nomor HP
+            </label>
+
+            <input
+              id="noHp"
+              name="noHp"
+              type="text"
+              placeholder="08xxxxxxxxxx"
+              value={form.noHp}
+              onChange={handleChange}
             />
           </div>
 
@@ -98,12 +149,11 @@ export default function LoginPage() {
 
             <input
               id="password"
+              name="password"
               type="password"
               placeholder="Masukkan password"
-              value={password}
-              onChange={(e) =>
-                setPassword(e.target.value)
-              }
+              value={form.password}
+              onChange={handleChange}
             />
           </div>
 
@@ -111,15 +161,15 @@ export default function LoginPage() {
             type="submit"
             disabled={loading}
           >
-            {loading ? "Memproses..." : "Masuk"}
+            {loading ? "Mendaftarkan..." : "Daftar"}
           </button>
         </form>
 
         <p className="register-text">
-          Belum punya akun?{" "}
+          Sudah punya akun?{" "}
 
-          <Link href="/register">
-            Daftar di sini
+          <Link href="/">
+            Kembali ke Login
           </Link>
         </p>
 
