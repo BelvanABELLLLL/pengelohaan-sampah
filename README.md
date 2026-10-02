@@ -1,3 +1,16 @@
+
+## Neon and Vercel
+
+For local development, copy `.env.example` to `.env`. Set `DATABASE_URL` to the pooled Neon connection string and `DATABASE_URL_UNPOOLED` to the direct connection string from Neon **Connect**. Set `JWT_SECRET` to a strong random value, then run:
+
+```bash
+npx prisma migrate dev
+npm run dev
+```
+
+In Vercel **Project Settings → Environment Variables**, add `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, and `JWT_SECRET`. Use separate Neon databases or branches for Preview and Production so Preview builds cannot migrate the Production database. The install hook generates Prisma Client; the build command applies pending migrations before building Next.js.
+
+Never commit `.env` or share database connection strings. If a credential was exposed, rotate the Neon role password and update each environment using it.
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
